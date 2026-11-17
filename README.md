@@ -10,7 +10,13 @@ Click the **拼** button in the top bar to change the options.
 
 ## Install
 
-Search for **ABC Lyrics** in the Spicetify Marketplace, or install it by hand: copy `abc-lyrics.js` into your Spicetify `Extensions` folder, then run
+On macOS or Linux, run:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/vitgruib/spicetify-abc-lyrics/main/install.sh | sh
+```
+
+Or search for **ABC Lyrics** in the Spicetify Marketplace, or install it by hand: copy `abc-lyrics.js` into your Spicetify `Extensions` folder, then run
 
 ```sh
 spicetify config extensions abc-lyrics.js
