@@ -1,6 +1,6 @@
 {
   "name": "ABC Lyrics",
-  "description": "Convert Spotify lyrics from Traditional to Simplified Chinese, add pinyin above or below (or pinyin only), and optional English translations.",
+  "description": "Sing along to Chinese songs in a script you can read, or learn from them: Simplified characters, pinyin over each character, English translation.",
   "preview": "preview.png",
   "main": "abc-lyrics.js",
   "readme": "README.md",
