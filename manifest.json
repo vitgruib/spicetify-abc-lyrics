@@ -1,0 +1,9 @@
+{
+  "name": "Chinese Lyrics",
+  "description": "Convert Spotify lyrics from Traditional to Simplified Chinese, add pinyin above or below (or pinyin only), and optional English translations.",
+  "preview": "preview.png",
+  "main": "chinese-lyrics.js",
+  "readme": "README.md",
+  "authors": [{ "name": "vitgruib", "url": "https://github.com/vitgruib" }],
+  "tags": ["lyrics", "chinese", "pinyin", "translation"]
+}
