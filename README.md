@@ -1,5 +1,14 @@
 # ABC Lyrics
 
+Sing along to Chinese songs on Spotify in the script you can actually read.
+
+![Spotify lyrics with pinyin under each character](preview.png)
+
+**Who it's for**
+
+- **Singing along:** Spotify's Chinese lyrics only come in Traditional characters. Read Simplified? Switch to it. Can't read characters at all? Show pinyin only and sing from that.
+- **Chinese learners:** keep the characters and put pinyin above or below each one, then add an English translation to see what you're singing. Every song becomes reading practice.
+
 A [Spicetify](https://spicetify.app) extension for Spotify's built-in lyrics:
 
 - **Traditional → Simplified** Chinese conversion (via [opencc-js](https://github.com/nk2028/opencc-js))
