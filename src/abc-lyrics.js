@@ -33,7 +33,12 @@
   };
 
   const style = document.createElement("style");
-  style.textContent = `.${PINYIN_CLASS},.${ENGLISH_CLASS}{font-size:.55em;opacity:.75;font-weight:500;line-height:1.3;margin:.15em 0}.${ENGLISH_CLASS}{font-style:italic}`;
+  style.textContent = `
+    .${PINYIN_CLASS}--above ruby{ruby-position:over}
+    .${PINYIN_CLASS}--below ruby{ruby-position:under}
+    .${PINYIN_CLASS} rt{font-size:.42em;font-weight:500;opacity:.75;letter-spacing:0}
+    .${PINYIN_CLASS} ruby{margin:0 .04em}
+    .${ENGLISH_CLASS}{font-size:.55em;opacity:.75;font-weight:500;line-height:1.3;margin:.15em 0;font-style:italic}`;
   document.head.appendChild(style);
 
   // Translations come from Google Translate's free endpoint, one request per
@@ -64,6 +69,28 @@
     processAll();
   }
 
+  // pinyin-pro reads each character in the context of its phrase; if OpenCC
+  // changed the length, fall back to reading characters one by one.
+  function rubyLine(text) {
+    const chars = [...text];
+    let readings = pinyinPro.pinyin(toSimplified(text), { type: "all" });
+    if (readings.length !== chars.length) readings = chars.map((c) => pinyinPro.pinyin(toSimplified(c), { type: "all" })[0]);
+    const el = document.createElement("span");
+    el.className = `${PINYIN_CLASS} ${PINYIN_CLASS}--${settings.pinyin}`;
+    chars.forEach((char, i) => {
+      if (!readings[i]?.isZh) {
+        el.append(char);
+        return;
+      }
+      const r = document.createElement("ruby");
+      const rt = document.createElement("rt");
+      rt.textContent = readings[i].pinyin;
+      r.append(char, rt);
+      el.append(r);
+    });
+    return el;
+  }
+
   // Each text node remembers its original text, so turning an option off
   // restores it and React's own updates are picked up as new originals.
   const originals = new WeakMap();
@@ -76,6 +103,11 @@
           ? NodeFilter.FILTER_REJECT
           : NodeFilter.FILTER_ACCEPT,
     });
+    // Above/below: Spotify's text nodes are emptied and the line is redrawn as
+    // <ruby>, so each syllable sits exactly over or under its character.
+    const ruby = settings.pinyin === "below" || settings.pinyin === "above";
+    let displayed = "";
+    const parts = [];
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       const known = originals.get(node);
       const source = known && node.nodeValue === known.shown ? known.original : node.nodeValue;
@@ -83,26 +115,29 @@
       let shown = source;
       if (settings.pinyin === "only" && HAN.test(source)) shown = toPinyin(source);
       else if (settings.simplified) shown = toSimplified(source);
+      displayed += shown;
+      parts.push([node, source, shown]);
+    }
+
+    const hasHan = HAN.test(original);
+    for (const [node, source, text] of parts) {
+      const shown = ruby && hasHan ? "" : text;
       originals.set(node, { original: source, shown });
       if (node.nodeValue !== shown) node.nodeValue = shown;
     }
 
-    const hasHan = HAN.test(original);
-
     let pinyinEl = textEl.querySelector(`:scope > .${PINYIN_CLASS}`);
-    const wantsPinyin = hasHan && (settings.pinyin === "below" || settings.pinyin === "above");
-    if (!wantsPinyin) {
+    if (!ruby || !hasHan) {
       pinyinEl?.remove();
     } else {
-      if (!pinyinEl) {
-        pinyinEl = document.createElement("div");
-        pinyinEl.className = PINYIN_CLASS;
+      const key = `${settings.pinyin}|${displayed}`;
+      if (pinyinEl?.dataset.key !== key) {
+        pinyinEl?.remove();
+        pinyinEl = rubyLine(displayed);
+        pinyinEl.dataset.key = key;
       }
-      const text = toPinyin(original);
-      if (pinyinEl.textContent !== text) pinyinEl.textContent = text;
-      const anchor = settings.pinyin === "above" ? textEl.firstChild : null;
-      if (pinyinEl.parentNode !== textEl || (anchor !== pinyinEl && pinyinEl.nextSibling !== anchor)) {
-        textEl.insertBefore(pinyinEl, anchor);
+      if (pinyinEl.parentNode !== textEl || pinyinEl !== textEl.firstChild) {
+        textEl.insertBefore(pinyinEl, textEl.firstChild);
       }
     }
 
