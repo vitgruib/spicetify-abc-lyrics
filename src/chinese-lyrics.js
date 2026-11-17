@@ -121,15 +121,22 @@
     if (textEl.lastChild !== englishEl) textEl.appendChild(englishEl);
   }
 
-  // Spotify strips per-line test ids in production builds; each lyric line is a
-  // div[dir="auto"] whose first child holds the text.
+  // Spotify strips the lyrics test ids and obfuscates class names, so lines are
+  // found by shape: a div[dir="auto"] among 3+ such siblings, whose first child
+  // holds the text and has no elements of its own besides ours.
+  const OURS = `.${PINYIN_CLASS},.${ENGLISH_CLASS}`;
+  function isLyricLine(line) {
+    const textEl = line.firstElementChild;
+    if (!textEl || textEl.tagName !== "DIV" || textEl.matches(OURS)) return false;
+    if ([...textEl.children].some((c) => !c.matches(OURS))) return false;
+    const siblings = line.parentElement.querySelectorAll(':scope > div[dir="auto"]');
+    return siblings.length >= 3;
+  }
+
   function processAll() {
     observer.disconnect();
-    for (const container of document.querySelectorAll('[data-testid="lyrics-container"]')) {
-      for (const line of container.querySelectorAll('div[dir="auto"]')) {
-        const textEl = line.firstElementChild;
-        if (textEl && !textEl.matches(`.${PINYIN_CLASS},.${ENGLISH_CLASS}`)) processLine(textEl);
-      }
+    for (const line of document.querySelectorAll('div[dir="auto"]')) {
+      if (isLyricLine(line)) processLine(line.firstElementChild);
     }
     observer.observe(document.body, { childList: true, subtree: true, characterData: true });
   }
@@ -185,9 +192,22 @@
 
   const ICON =
     '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><text x="8" y="13" text-anchor="middle" font-size="13" font-weight="700">拼</text></svg>';
-  new Spicetify.Topbar.Button("Chinese Lyrics", ICON, () =>
-    Spicetify.PopupModal.display({ title: "Chinese Lyrics", content: settingsPanel() })
-  );
+  const openSettings = () => Spicetify.PopupModal.display({ title: "Chinese Lyrics", content: settingsPanel() });
+  const topbarButton = new Spicetify.Topbar.Button("Chinese Lyrics", ICON, openSettings);
 
-  window.__chineseLyrics = { settings, processAll };
+  // Newer Spotify builds can lack the container Spicetify.Topbar mounts into.
+  // Then copy a custom-app nav icon (Marketplace etc.) and keep our copy beside it.
+  setInterval(() => {
+    if (topbarButton.element.isConnected || document.querySelector(".chinese-lyrics-navlink")) return;
+    const model = document.querySelector("button.custom-navlink")?.parentElement;
+    if (!model) return;
+    const wrapper = model.cloneNode(true);
+    const button = wrapper.querySelector("button");
+    button.classList.add("chinese-lyrics-navlink");
+    button.setAttribute("aria-label", "Chinese Lyrics");
+    button.title = "Chinese Lyrics";
+    button.querySelector("span").innerHTML = ICON;
+    button.onclick = openSettings;
+    model.parentElement.appendChild(wrapper);
+  }, 1000);
 })();
