@@ -1,22 +1,22 @@
-// Chinese Lyrics: converts Spotify's lyrics from Traditional to Simplified
+// ABC Lyrics: converts Spotify's lyrics from Traditional to Simplified
 // Chinese and adds pinyin. Options open from the 拼 button in the top bar.
 
-(function chineseLyrics() {
+(function abcLyrics() {
   if (!Spicetify?.Topbar || !Spicetify?.PopupModal || !document.body) {
-    setTimeout(chineseLyrics, 300);
+    setTimeout(abcLyrics, 300);
     return;
   }
 
   const toSimplified = OpenCC.Converter({ from: "tw", to: "cn" });
   const toPinyin = (text) => pinyinPro.pinyin(toSimplified(text), { nonZh: "consecutive" });
   const HAN = /\p{Script=Han}/u;
-  const PINYIN_CLASS = "chinese-lyrics-pinyin";
-  const ENGLISH_CLASS = "chinese-lyrics-english";
+  const PINYIN_CLASS = "abc-lyrics-pinyin";
+  const ENGLISH_CLASS = "abc-lyrics-english";
   const PINYIN_MODES = { off: "Off", below: "Below characters", above: "Above characters", only: "Pinyin only" };
 
   const read = (key, fallback) => {
     try {
-      return localStorage.getItem(`chinese-lyrics:${key}`) ?? fallback;
+      return localStorage.getItem(`abc-lyrics:${key}`) ?? fallback;
     } catch {
       return fallback;
     }
@@ -28,7 +28,7 @@
   };
   const save = (key) => {
     try {
-      localStorage.setItem(`chinese-lyrics:${key}`, String(settings[key]));
+      localStorage.setItem(`abc-lyrics:${key}`, String(settings[key]));
     } catch {}
   };
 
@@ -58,7 +58,7 @@
       const out = data[0].map((seg) => seg[0]).join("").split("\n");
       lines.forEach((line, i) => translations.set(line, (out[i] ?? "").trim()));
     } catch (e) {
-      console.error("Chinese Lyrics: translation failed", e);
+      console.error("ABC Lyrics: translation failed", e);
     }
     for (const line of lines) pending.delete(line);
     processAll();
@@ -181,7 +181,7 @@
     for (const [mode, label] of Object.entries(PINYIN_MODES)) {
       const input = document.createElement("input");
       input.type = "radio";
-      input.name = "chinese-lyrics-pinyin";
+      input.name = "abc-lyrics-pinyin";
       input.checked = settings.pinyin === mode;
       input.onchange = () => update("pinyin", mode);
       panel.append(row(input, label));
@@ -192,20 +192,20 @@
 
   const ICON =
     '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><text x="8" y="13" text-anchor="middle" font-size="13" font-weight="700">拼</text></svg>';
-  const openSettings = () => Spicetify.PopupModal.display({ title: "Chinese Lyrics", content: settingsPanel() });
-  const topbarButton = new Spicetify.Topbar.Button("Chinese Lyrics", ICON, openSettings);
+  const openSettings = () => Spicetify.PopupModal.display({ title: "ABC Lyrics", content: settingsPanel() });
+  const topbarButton = new Spicetify.Topbar.Button("ABC Lyrics", ICON, openSettings);
 
   // Newer Spotify builds can lack the container Spicetify.Topbar mounts into.
   // Then copy a custom-app nav icon (Marketplace etc.) and keep our copy beside it.
   setInterval(() => {
-    if (topbarButton.element.isConnected || document.querySelector(".chinese-lyrics-navlink")) return;
+    if (topbarButton.element.isConnected || document.querySelector(".abc-lyrics-navlink")) return;
     const model = document.querySelector("button.custom-navlink")?.parentElement;
     if (!model) return;
     const wrapper = model.cloneNode(true);
     const button = wrapper.querySelector("button");
-    button.classList.add("chinese-lyrics-navlink");
-    button.setAttribute("aria-label", "Chinese Lyrics");
-    button.title = "Chinese Lyrics";
+    button.classList.add("abc-lyrics-navlink");
+    button.setAttribute("aria-label", "ABC Lyrics");
+    button.title = "ABC Lyrics";
     button.querySelector("span").innerHTML = ICON;
     button.onclick = openSettings;
     model.parentElement.appendChild(wrapper);

@@ -1,4 +1,4 @@
-# Chinese Lyrics
+# ABC Lyrics
 
 A [Spicetify](https://spicetify.app) extension for Spotify's built-in lyrics:
 
@@ -10,10 +10,10 @@ Click the **拼** button in the top bar to change the options.
 
 ## Install
 
-Search for **Chinese Lyrics** in the Spicetify Marketplace, or install it by hand: copy `chinese-lyrics.js` into your Spicetify `Extensions` folder, then run
+Search for **ABC Lyrics** in the Spicetify Marketplace, or install it by hand: copy `abc-lyrics.js` into your Spicetify `Extensions` folder, then run
 
 ```sh
-spicetify config extensions chinese-lyrics.js
+spicetify config extensions abc-lyrics.js
 spicetify apply
 ```
 
@@ -21,7 +21,7 @@ spicetify apply
 
 - English translation sends each song's lyric lines to Google Translate's public endpoint. It's off until you turn it on.
 - Pinyin uses each character's most common reading, so characters with several readings (了, 长, 行…) are sometimes wrong.
-- Both libraries are bundled into `chinese-lyrics.js` by `build.sh`. Edit `src/chinese-lyrics.js`, then run `./build.sh`.
+- Both libraries are bundled into `abc-lyrics.js` by `build.sh`. Edit `src/abc-lyrics.js`, then run `./build.sh`.
 
 ## License
 
