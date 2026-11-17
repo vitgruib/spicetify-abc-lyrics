@@ -568,7 +568,9 @@
     button.classList.add("abc-lyrics-navlink");
     button.setAttribute("aria-label", "ABC Lyrics");
     button.title = "ABC Lyrics";
-    button.querySelector("span").innerHTML = ICON;
+    // Keep the copied icon's outer svg, which Spotify sizes, and swap its drawing.
+    button.querySelector("span > svg").innerHTML =
+      '<svg viewBox="0 0 24 24" fill="currentColor"><text x="12" y="20" text-anchor="middle" font-size="21" font-weight="700">拼</text></svg>';
     button.onclick = openSettings;
     model.parentElement.appendChild(wrapper);
   }, 1000);
