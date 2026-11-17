@@ -21,7 +21,7 @@ spicetify apply
 
 - English translation sends each song's lyric lines to Google Translate's public endpoint. It's off until you turn it on.
 - Pinyin uses each character's most common reading, so characters with several readings (了, 长, 行…) are sometimes wrong.
-- The two libraries load from jsDelivr when Spotify starts, so the first launch needs internet.
+- Both libraries are bundled into `chinese-lyrics.js` by `build.sh`. Edit `src/chinese-lyrics.js`, then run `./build.sh`.
 
 ## License
 
