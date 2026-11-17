@@ -6,7 +6,7 @@ A [Spicetify](https://spicetify.app) extension for Spotify's built-in lyrics:
 - **Pinyin** with tone marks (via [pinyin-pro](https://github.com/zh-lx/pinyin-pro)): below the characters, above them, or pinyin only
 - **English translation** under each line (off by default)
 
-All options are in the profile menu → **Chinese Lyrics**.
+Click the **拼** button in the top bar to change the options.
 
 ## Install
 

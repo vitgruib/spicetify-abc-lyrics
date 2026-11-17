@@ -1,8 +1,8 @@
 // Chinese Lyrics: converts Spotify's lyrics from Traditional to Simplified
-// Chinese and adds pinyin. Options live in the profile menu → Chinese Lyrics.
+// Chinese and adds pinyin. Options open from the 拼 button in the top bar.
 
 (async function chineseLyrics() {
-  if (!Spicetify?.Menu || !document.body) {
+  if (!Spicetify?.Topbar || !Spicetify?.PopupModal || !document.body) {
     setTimeout(chineseLyrics, 300);
     return;
   }
@@ -159,28 +159,49 @@
   });
   processAll();
 
-  const simplifiedItem = new Spicetify.Menu.Item("Traditional → Simplified", settings.simplified, (item) => {
-    settings.simplified = !settings.simplified;
-    item.setState(settings.simplified);
-    save("simplified");
+  function update(key, value) {
+    settings[key] = value;
+    save(key);
     processAll();
-  });
-  const modeItems = Object.entries(PINYIN_MODES).map(
-    ([mode, label]) =>
-      new Spicetify.Menu.Item(`Pinyin: ${label}`, settings.pinyin === mode, () => {
-        settings.pinyin = mode;
-        for (const [i, m] of Object.keys(PINYIN_MODES).entries()) modeItems[i].setState(m === mode);
-        save("pinyin");
-        processAll();
-      })
+  }
+
+  function settingsPanel() {
+    const panel = document.createElement("div");
+    panel.style.cssText = "display:flex;flex-direction:column;gap:12px;font-size:14px";
+    const row = (input, label) => {
+      const el = document.createElement("label");
+      el.style.cssText = "display:flex;align-items:center;gap:8px;cursor:pointer";
+      el.append(input, label);
+      return el;
+    };
+    const checkbox = (key, label) => {
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.checked = settings[key];
+      input.onchange = () => update(key, input.checked);
+      return row(input, label);
+    };
+    const heading = document.createElement("strong");
+    heading.textContent = "Pinyin";
+
+    panel.append(checkbox("simplified", "Traditional → Simplified"), heading);
+    for (const [mode, label] of Object.entries(PINYIN_MODES)) {
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = "chinese-lyrics-pinyin";
+      input.checked = settings.pinyin === mode;
+      input.onchange = () => update("pinyin", mode);
+      panel.append(row(input, label));
+    }
+    panel.append(checkbox("english", "English translation (uses Google Translate)"));
+    return panel;
+  }
+
+  const ICON =
+    '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><text x="8" y="13" text-anchor="middle" font-size="13" font-weight="700">拼</text></svg>';
+  new Spicetify.Topbar.Button("Chinese Lyrics", ICON, () =>
+    Spicetify.PopupModal.display({ title: "Chinese Lyrics", content: settingsPanel() })
   );
-  const englishItem = new Spicetify.Menu.Item("English translation", settings.english, (item) => {
-    settings.english = !settings.english;
-    item.setState(settings.english);
-    save("english");
-    processAll();
-  });
-  new Spicetify.Menu.SubMenu("Chinese Lyrics", [simplifiedItem, ...modeItems, englishItem]).register();
 
   window.__chineseLyrics = { settings, processAll };
 })();
