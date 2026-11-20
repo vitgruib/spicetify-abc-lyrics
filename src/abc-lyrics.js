@@ -225,8 +225,9 @@
     return panel;
   }
 
+  // 24px, the size Spotify gives the custom-app nav icons beside it.
   const ICON =
-    '<svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor"><text x="8" y="13" text-anchor="middle" font-size="13" font-weight="700">拼</text></svg>';
+    '<svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><text x="12" y="20" text-anchor="middle" font-size="21" font-weight="700">拼</text></svg>';
   const openSettings = () => Spicetify.PopupModal.display({ title: "ABC Lyrics", content: settingsPanel() });
   const topbarButton = new Spicetify.Topbar.Button("ABC Lyrics", ICON, openSettings);
 
@@ -242,8 +243,7 @@
     button.setAttribute("aria-label", "ABC Lyrics");
     button.title = "ABC Lyrics";
     // Keep the copied icon's outer svg, which Spotify sizes, and swap its drawing.
-    button.querySelector("span > svg").innerHTML =
-      '<svg viewBox="0 0 24 24" fill="currentColor"><text x="12" y="20" text-anchor="middle" font-size="21" font-weight="700">拼</text></svg>';
+    button.querySelector("span > svg").innerHTML = ICON;
     button.onclick = openSettings;
     model.parentElement.appendChild(wrapper);
   }, 1000);
